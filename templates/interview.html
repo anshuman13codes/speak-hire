@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><title>Questions</title>
+<style>
+body{ background:#0f172a; color:white; font-family:Arial; padding:20px;}
+.qbox{ background:#1e293b; padding:15px; border-radius:12px; margin:20px 0; border-left:5px solid #22c55e;}
+textarea{ width:95%; padding:10px; border-radius:8px; margin-top:10px; min-height:60px;}
+.btn{ padding:8px 15px; border:none; border-radius:6px; margin:8px 5px 0 0; cursor:pointer; font-weight:bold;}
+.green{ background:#22c55e; } .blue{ background:#38bdf8; } .orange{ background:#f59e0b; }
+.feedback{ background:#020617; border:1px solid #22c55e; padding:12px; margin-top:12px; border-radius:8px; white-space:pre-wrap; display:none;}
+a{ color:#22c55e; text-decoration:none; font-weight:bold;}
+</style>
+</head>
+<body>
+<a href="/">← Back</a>
+<h2>Questions for: {{ role }}</h2>
+
+{% for q in questions %}
+<div class="qbox">
+<b>{{ loop.index }}. {{ q }}</b><br>
+<textarea id="ans{{ loop.index }}" placeholder="Type or click 🎤 Speak..."></textarea><br>
+<button class="btn orange" onclick="startVoice({{ loop.index }})">🎤 Speak Answer</button>
+<button class="btn green" onclick="evaluateAns({{ loop.index }}, `{{ q|replace('`','')|replace('\"','') }}`)">🤖 Evaluate with AI</button>
+<button class="btn blue" onclick="stopVoice()">⏹️ Stop</button>
+<div id="feed{{ loop.index }}" class="feedback"></div>
+</div>
+{% endfor %}
+
+<script>
+let recognition;
+function startVoice(i){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){ alert("Use Chrome browser"); return; }
+  recognition = new SpeechRecognition();
+  recognition.lang='en-US'; recognition.interimResults=false;
+  recognition.start();
+  document.getElementById('ans'+i).placeholder='Listening... speak now...';
+  recognition.onresult = e => {
+    document.getElementById('ans'+i).value = e.results[0][0].transcript;
+    document.getElementById('ans'+i).placeholder='Got it!';
+  };
+  recognition.onerror = e => { alert("Mic error: "+e.error); }
+}
+function stopVoice(){ if(recognition) recognition.stop(); }
+
+async function evaluateAns(i, question){
+  let answer = document.getElementById('ans'+i).value;
+  if(!answer){ alert("Speak or type answer first!"); return; }
+  let feed = document.getElementById('feed'+i);
+  feed.style.display='block';
+  feed.innerText='🤖 AI is checking your answer...';
+  try{
+    let res = await fetch('/evaluate',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question, answer})});
+    let data = await res.json();
+    feed.innerText = data.feedback;
+  }catch(e){ feed.innerText='Error: '+e; }
+}
+</script>
+</body>
+</html>
