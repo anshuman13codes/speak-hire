@@ -8,12 +8,23 @@ textarea{ width:95%; padding:10px; border-radius:8px; margin-top:10px; min-heigh
 .btn{ padding:8px 15px; border:none; border-radius:6px; margin:8px 5px 0 0; cursor:pointer; font-weight:bold;}
 .green{ background:#22c55e; } .blue{ background:#38bdf8; } .orange{ background:#f59e0b; }
 .feedback{ background:#020617; border:1px solid #22c55e; padding:12px; margin-top:12px; border-radius:8px; white-space:pre-wrap; display:none;}
+.error{background:#450a0a;border:1px solid #991b1b;padding:16px;border-radius:10px;line-height:1.6;}
+.configure{display:inline-block;background:#22c55e;color:#052e16;padding:10px 14px;border-radius:7px;margin-top:8px;}
 a{ color:#22c55e; text-decoration:none; font-weight:bold;}
+.account{float:right;color:#cbd5e1;font-size:14px;}
 </style>
 </head>
 <body>
 <a href="/">← Back</a>
+<span class="account">{{ session.user.name }} · <a href="{{ url_for('logout') }}">Sign out</a></span>
 <h2>Questions for: {{ role }}</h2>
+
+{% if error %}
+<div class="error" role="alert">
+  {{ error }}
+  {% if show_configure_button %}<br><a class="configure" href="{{ url_for('configure_groq') }}">Click here to configure Groq key</a>{% endif %}
+</div>
+{% endif %}
 
 {% for q in questions %}
 <div class="qbox">
@@ -53,7 +64,15 @@ async function evaluateAns(i, question){
     let res = await fetch('/evaluate',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question, answer})});
     let data = await res.json();
     feed.innerText = data.feedback;
-  }catch(e){ feed.innerText='Error: '+e; }
+    if(data.configure){
+      const link = document.createElement('a');
+      link.className = 'configure';
+      link.href = data.configure_url;
+      link.textContent = 'Click here to configure Groq key';
+      feed.appendChild(document.createElement('br'));
+      feed.appendChild(link);
+    }
+  }catch(e){ feed.innerText='Could not reach the server. Please try again.'; }
 }
 </script>
 </body>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configure Groq | Speak-Hire</title>
+    <style>
+        body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; box-sizing: border-box; background: #0f172a; color: #e2e8f0; font-family: Arial, sans-serif; }
+        main { width: min(100%, 620px); padding: 32px; border: 1px solid #334155; border-radius: 16px; background: #1e293b; }
+        h1 { margin-top: 0; }
+        p, li { color: #cbd5e1; line-height: 1.65; }
+        code { padding: 3px 6px; border-radius: 4px; background: #0f172a; color: #86efac; }
+        pre { overflow-x: auto; padding: 16px; border-radius: 8px; background: #0f172a; color: #86efac; }
+        a { color: #22c55e; font-weight: bold; text-decoration: none; }
+        .button { display: inline-block; margin: 8px 8px 0 0; padding: 12px 16px; border-radius: 8px; background: #22c55e; color: #052e16; }
+        .back { display: inline-block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Configure your Groq API key</h1>
+        <p>{{ missing_message }}</p>
+        <ol>
+            <li><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Create a free Groq API key</a>.</li>
+            <li>Put the key in a <code>.env</code> file in the project folder:</li>
+        </ol>
+        <pre>GROQ_API_KEY=your_key_here</pre>
+        <p>Restart Speak-Hire after saving the file. Keep your key private and do not commit your <code>.env</code> file.</p>
+        <a class="button" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Open Groq Console</a>
+        <a class="back" href="{{ url_for('home') }}">← Back to Speak-Hire</a>
+    </main>
+</body>
+</html>
